@@ -1,0 +1,507 @@
+stage.focus = stage;
+var leftKeyDown:Boolean = false;
+var upKeyDown:Boolean = false;
+var rightKeyDown:Boolean = false;
+var downKeyDown:Boolean = false;
+var mainSpeed:Number = 7;
+var enemySpeed:Number = 1;
+
+var speed:Number = 6;
+var turnRate:Number = .2;
+var agroRange:Number = 200;
+var distanceTotal:Number=0;
+
+var moveX:Number = 0;
+var moveY:Number = 0;
+var count:Number=0;
+var done:Boolean = false;
+
+var kC:Boolean = false;
+var k2C:Boolean = false;
+var k3C:Boolean = false;
+var fC:Boolean = false;
+
+//adding a listener to mcMain which will make it move 
+//based on the key strokes that are down
+var fl_SecondsToCountDown:Number = 0;
+
+var fl_CountDownTimerInstance:Timer = new Timer(1000, fl_SecondsToCountDown);
+fl_CountDownTimerInstance.addEventListener(TimerEvent.TIMER, fl_CountDownTimerHandler);
+fl_CountDownTimerInstance.start();
+
+function fl_CountDownTimerHandler(event:TimerEvent):void
+{
+	countD.text =fl_SecondsToCountDown.toString();
+	//trace (fl_SecondsToCountDown);
+	if(fl_SecondsToCountDown<=0)
+	{
+		fl_SecondsToCountDown=0;
+	}
+	else
+	{
+		fl_SecondsToCountDown--;
+	}
+}
+
+mcMain.addEventListener(Event.ENTER_FRAME, moveChar);
+function moveChar(event:Event):void{
+	//if certain keys are down then move the character
+	if(leftKeyDown){
+		mcMain.x -= mainSpeed;
+		if(mcMain.hitTestObject(blb1)||mcMain.hitTestObject(blb3)||mcMain.hitTestObject(tlb1)||mcMain.hitTestObject(tlb2)||mcMain.hitTestObject(brb1)||mcMain.hitTestObject(brb2)||mcMain.hitTestObject(ctrb)||mcMain.hitTestObject(ctlb)||mcMain.hitTestObject(cbrb)||mcMain.hitTestObject(cblb)||mcMain.hitTestObject(lb)||mcMain.hitTestObject(brb)||mcMain.hitTestObject(blb))
+		{
+			mcMain.x += mainSpeed;
+		}
+	}
+	if(rightKeyDown){
+		mcMain.x += mainSpeed;
+		if(mcMain.hitTestObject(blb1)||mcMain.hitTestObject(blb3)||mcMain.hitTestObject(tlb1)||mcMain.hitTestObject(tlb2)||mcMain.hitTestObject(brb1)||mcMain.hitTestObject(brb2)||mcMain.hitTestObject(ctrb)||mcMain.hitTestObject(ctlb)||mcMain.hitTestObject(cbrb)||mcMain.hitTestObject(cblb)||mcMain.hitTestObject(rb))
+		{
+			mcMain.x -= mainSpeed;
+		}
+		
+	}
+	if(upKeyDown){
+		mcMain.y -= mainSpeed;
+		if(mcMain.hitTestObject(blb2)||mcMain.hitTestObject(blb1)||mcMain.hitTestObject(blb3)||mcMain.hitTestObject(tlb1)||mcMain.hitTestObject(tlb2)||mcMain.hitTestObject(brb1)||mcMain.hitTestObject(brb2)||mcMain.hitTestObject(ctrb)||mcMain.hitTestObject(ctlb)||mcMain.hitTestObject(cbrb)||mcMain.hitTestObject(cblb)||mcMain.hitTestObject(tb))
+		{
+			mcMain.y += mainSpeed;
+		}
+	}
+	if(downKeyDown){
+		mcMain.y += mainSpeed;
+		if(mcMain.hitTestObject(b)||mcMain.hitTestObject(blb2)||mcMain.hitTestObject(blb1)||mcMain.hitTestObject(blb3)||mcMain.hitTestObject(tlb1)||mcMain.hitTestObject(tlb2)||mcMain.hitTestObject(brb1)||mcMain.hitTestObject(brb2)||mcMain.hitTestObject(ctrb)||mcMain.hitTestObject(ctlb)||mcMain.hitTestObject(cbrb)||mcMain.hitTestObject(cblb)||mcMain.hitTestObject(blb)||mcMain.hitTestObject(brb))
+		{
+			mcMain.y -= mainSpeed;
+		}
+		if(mcMain.hitTestObject(f))
+		{
+			done = true;
+			var mainSpeed:Number = 0;
+			var enemySpeed:Number = 0;
+			gotoAndPlay(1);
+		}
+	}
+	if(mcMain.hitTestObject(ar1)||mcMain.hitTestObject(ar2))
+	{
+		//trace("Opps Wrong Place");
+		//trace("Following");
+		//calculate distance between follower and target
+		var distanceX:Number = mcMain.x-enm4.x;
+		var distanceY:Number = mcMain.y-enm4.y;
+		
+		//get total distance as one number
+		distanceTotal = Math.sqrt(distanceX*distanceX+distanceY*distanceY);
+		
+		//check if target is within agro range
+		if(distanceTotal <= agroRange)
+		{
+			//calculate how much to move
+			var moveDistanceX:Number = turnRate*distanceX/distanceTotal;
+			var moveDistanceY:Number = turnRate*distanceY/distanceTotal;
+			
+			//increase current speed
+			moveX += moveDistanceX;
+			moveY += moveDistanceY;
+			
+			//get total move distance
+			var totalmove = Math.sqrt(moveX*moveX+moveY*moveY);
+			
+			//apply easing
+			moveX = speed*moveX/totalmove;
+			moveY = speed*moveY/totalmove;
+			
+			//move follower
+			enm4.x += moveX;
+			if(enm4.hitTestObject(rb)||enm4.hitTestObject(tlb2)||enm4.hitTestObject(tlb2)||enm4.hitTestObject(ctrb))
+			{
+				enm4.x -= moveX;
+			}
+			enm4.y += moveY;
+			if(enm4.hitTestObject(tb)||enm4.hitTestObject(brb1)||enm4.hitTestObject(ctrb)||enm4.hitTestObject(ctlb))
+			{
+				enm4.y -= moveY;
+			}
+			
+			//rotate follower toward target
+			enm4.rotation = 180*Math.atan2(moveY, moveX)/Math.PI;
+		}
+	}
+	if(mcMain.hitTestObject(k1))
+	{
+		count++;
+		fl_SecondsToCountDown+=10;
+		enemySpeed++;
+		trace(count);
+		k1.alpha=0;
+		k1.y+=100;
+		kC=true;
+	}
+	if(mcMain.hitTestObject(k2))
+	{
+		count++;
+		fl_SecondsToCountDown+=10;
+		enemySpeed++;
+		trace(count);
+		k2.alpha=0;
+		k2.y+=100;
+		k2C=true;
+	}
+	if(mcMain.hitTestObject(k3))
+	{
+		count++;
+		fl_SecondsToCountDown+=10;
+		enemySpeed++;
+		trace(count);
+		k3.alpha=0;
+		k3.y+=100;
+		k3C=true;
+	}
+	
+	if (count == 3)
+	{
+		fk.x=344;
+		fk.y=285;
+		fk.alpha=100;
+	}
+	if(mcMain.hitTestObject(f))
+	{
+		done = true;
+		gotoAndPlay(1);
+	}
+	if(mcMain.hitTestObject(fk))
+	{
+		//trace("final key");
+		b.x=324;
+		f.x=324;
+		b.alpha=0;
+		f.alpha=100;
+		fk.alpha-=100;
+		k1.y+=50;
+	}
+	if(mcMain.hitTestObject(enm1)||mcMain.hitTestObject(enm2)||mcMain.hitTestObject(enm3)||mcMain.hitTestObject(enm4)||mcMain.hitTestObject(enm5))
+	{
+		done = true;
+		gotoAndPlay(1);
+	}
+	if(kC==true)
+	{
+		if(fl_SecondsToCountDown==0)
+		{
+			enemySpeed--;
+			k1.alpha=100;
+			k1.y+=100;
+			kC=false;
+		}
+	}
+	if(k2C==true)
+	{
+		if(fl_SecondsToCountDown==0)
+		{
+			enemySpeed--;
+			k2.alpha=100;
+			k2.y+=100;
+			kC=false;
+		}
+	}
+	if(k3C==true)
+	{
+		if(fl_SecondsToCountDown==0)
+		{
+			enemySpeed--;
+			k3.alpha=100;
+			k3.y+=100;
+			kC=false;
+		}
+	}
+
+}
+
+stage.addEventListener(KeyboardEvent.KEY_DOWN, checkKeysDown);
+function checkKeysDown(event:KeyboardEvent):void{
+	if(event.keyCode == 37 || event.keyCode == 65){
+		leftKeyDown = true;
+	}
+	if(event.keyCode == 38 || event.keyCode == 87){
+		upKeyDown = true;
+	}
+	if(event.keyCode == 39 || event.keyCode == 68){
+		rightKeyDown = true;
+	}
+	if(event.keyCode == 40 || event.keyCode == 83){
+		downKeyDown = true;
+	}
+}
+stage.addEventListener(KeyboardEvent.KEY_UP, checkKeysUp);
+function checkKeysUp(event:KeyboardEvent):void{
+	if(event.keyCode == 37 || event.keyCode == 65){
+		leftKeyDown = false;
+	}
+	if(event.keyCode == 38 || event.keyCode == 87){
+		upKeyDown = false;
+	}
+	if(event.keyCode == 39 || event.keyCode == 68){
+		rightKeyDown = false;
+	}
+	if(event.keyCode == 40 || event.keyCode == 83){
+		downKeyDown = false;
+	}
+}
+
+
+
+var right:Boolean = true;
+var up:Boolean = false;
+var left:Boolean = false;
+var down:Boolean = false;
+
+var right2:Boolean = false;
+var up2:Boolean = false;
+var left2:Boolean = true;
+var down2:Boolean = false;
+
+var right3:Boolean = false;
+var up3:Boolean = false;
+var left3:Boolean = true;
+var down3:Boolean = false;
+
+var right4:Boolean = false;
+var diagRUp:Boolean = false;
+var left4:Boolean = true;
+var diagRDw:Boolean = false;
+
+
+while(!done)
+{
+	enm1.addEventListener(Event.ENTER_FRAME, moveEnm1);
+	enm2.addEventListener(Event.ENTER_FRAME, moveEnm1);
+	enm3.addEventListener(Event.ENTER_FRAME, moveEnm1);
+	enm5.addEventListener(Event.ENTER_FRAME, moveEnm1);
+
+	function moveEnm1(event:Event):void
+	{
+			if(right)
+			{
+				//trace("Moving Right");
+				//trace(enemySpeed);
+				enm1.x += enemySpeed;
+				if(enm1.hitTestObject(b1))
+				{
+					enm1.x -= enemySpeed;
+					right = false
+					up = true;
+				}
+				if(enm1.hitTestObject(b3))
+				{
+					enm1.x -= enemySpeed;
+					right = false
+					down = true;
+				}
+			}
+			if(up)
+			{
+				//trace("Moving Up");
+				enm1.y -= enemySpeed;
+				if(enm1.hitTestObject(b2))
+				{
+					enm1.y += enemySpeed;
+					up = false;
+					right =true;
+				}
+			}
+			if(down)
+			{
+				//trace("Moving down");
+				enm1.y += enemySpeed;
+				if(enm1.hitTestObject(b4))
+				{
+					enm1.y -= enemySpeed;
+					down = false;
+					left =true;
+				}
+				if(enm1.hitTestObject(b6))
+				{
+					enm1.y -= enemySpeed;
+					down = false;
+					right =true;
+				}
+			}
+			if(left)
+			{
+				//trace("Moving Left");
+				enm1.x -= enemySpeed;
+				if(enm1.hitTestObject(b5))
+				{
+					enm1.x += enemySpeed;
+					left = false;
+					down = true;
+				}
+			}
+			
+			
+			
+			if(right2)
+			{
+				//trace("E2 Moving Right");
+				enm2.x += enemySpeed;
+				if(enm2.hitTestObject(b5e2))
+				{
+					enm2.x -= enemySpeed;
+					right2 = false
+					up2 = true;
+				}
+				if(enm2.hitTestObject(b3e2))
+				{
+					enm2.x -= enemySpeed;
+					right2 = false
+					down2 = true;
+				}
+			}
+			if(up2)
+			{
+				//trace("E2 Moving Up");
+				enm2.y -= enemySpeed;
+				if(enm2.hitTestObject(b2e2))
+				{
+					enm2.y += enemySpeed;
+					up2 = false;
+					right2 =true;
+				}
+				if(enm2.hitTestObject(b6e2))
+				{
+					enm2.y += enemySpeed;
+					up2 = false;
+					left2 =true;
+				}
+			}
+			if(down2)
+			{
+				//trace("E2 Moving down");
+				enm2.y += enemySpeed;
+				if(enm2.hitTestObject(b4e2))
+				{
+					enm2.y -= enemySpeed;
+					down2 = false;
+					right2 =true;
+				}
+			}
+			if(left2)
+			{
+				//trace("E2 Moving Left");
+				enm2.x -= enemySpeed;
+				if(enm2.hitTestObject(b1e2))
+				{
+					enm2.x += enemySpeed;
+					left2 = false;
+					up2 = true;
+				}
+			}
+			
+			
+			if(right3)
+			{
+				//trace("E3 Moving Right");
+				enm3.x += enemySpeed;
+				if(enm3.hitTestObject(b3e3))
+				{
+					enm3.x -= enemySpeed;
+					right3 = false
+					up3 = true;
+				}
+			}
+			if(up3)
+			{
+				//trace("E3 Moving Up");
+				enm3.y -= enemySpeed;
+				if(enm3.hitTestObject(b4e3))
+				{
+					enm3.y += enemySpeed;
+					up3 = false;
+					left3 =true;
+				}
+			}
+			if(down3)
+			{
+				//trace("E3 Moving down");
+				enm3.y += enemySpeed;
+				if(enm3.hitTestObject(b2e3))
+				{
+					enm3.y -= enemySpeed;
+					down3 = false;
+					right3 =true;
+				}
+			}
+			if(left3)
+			{
+				//trace("E3 Moving Left");
+				enm3.x -= enemySpeed;
+				if(enm3.hitTestObject(b1e3))
+				{
+					enm3.x += enemySpeed;
+					left3 = false;
+					down3 = true;
+				}
+			}
+			
+			
+			if(left4)
+			{
+				//trace("E5 Moving Left");
+				enm5.x -= enemySpeed;
+				if(enm5.hitTestObject(b1e5))
+				{
+					enm5.x += enemySpeed;
+					left4 = false;
+					diagRUp = true;
+				}
+				if(enm5.hitTestObject(b3e5))
+				{
+					enm5.x += enemySpeed;
+					left4 = false;
+					diagRDw = true;
+				}
+			}
+			if(diagRUp)
+			{
+				//trace("E5 Moving diag Right Up");
+				enm5.y -= enemySpeed;
+				enm5.x += enemySpeed;
+				if(enm5.hitTestObject(b2e5))
+				{
+					enm5.y += enemySpeed;
+					enm5.x -= enemySpeed;
+					diagRUp = false;
+					left4 =true;
+				}
+			}
+			if(diagRDw)
+			{
+				//trace("E5 Moving diag Right Down");
+				enm5.y += enemySpeed;
+				enm5.x += enemySpeed+.5;
+				if(enm5.hitTestObject(b4e5))
+				{
+					enm5.y -= enemySpeed;
+					enm5.x -= enemySpeed;
+					diagRDw = false;
+					left4 =true;
+				}
+			}
+			if(enm5.hitTestObject(blb))
+			{
+				enm5.y -= enemySpeed+3;
+					
+			}
+			
+	}
+	
+}
+
+/* Countdown Timer
+Counts down from a specified number of seconds.
+
+Instructions:
+1. To change the length of the countdown, change the value 10 in the first line below to the number of seconds you want.
+*/
+
+
