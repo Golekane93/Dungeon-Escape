@@ -1,0 +1,21 @@
+import flash.events.MouseEvent;
+import flash.system.fscommand;
+
+this.stop();
+/* Click to Go to Next Frame and Stop
+Clicking on the specified symbol instance moves the playhead to the next frame and stops the movie.
+*/
+
+button_2.addEventListener(MouseEvent.CLICK, fl_ClickToGoToNextFrame);
+
+function fl_ClickToGoToNextFrame(event:MouseEvent):void
+{
+	gotoAndStop(2);
+}
+
+exitButton_mc.addEventListener(MouseEvent.CLICK, clickHandler);
+
+function clickHandler(event:MouseEvent):void 
+{
+	fscommand("quit");
+}
